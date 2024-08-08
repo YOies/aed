@@ -1,0 +1,78 @@
+getgenv().Amount = 0
+getgenv().UnitName = ""
+local units = {}
+for i, v in pairs(game:GetService("Players").LocalPlayer.OwnedTowers:GetChildren()) do 
+    if v:IsA("StringValue") then 
+        local trait = v:GetAttribute("Trait")
+        if trait == nil or trait == "" then
+            trait = "None"
+        end
+        local level = v:GetAttribute("Level") 
+        table.insert(units, v.Name .. " - " .. trait .. " - " .. level)
+    end 
+end 
+
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/ttwizz/Roblox/master/Orion.lua", true))()
+local Window = OrionLib:MakeWindow({Name = "Private Shit", TestMode = true, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+local Tab = Window:MakeTab({
+	Name = "Main",
+	Icon = "rbxassetid://4483345998",
+	TestersOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "Free Gems"
+})
+
+Tab:AddButton({
+    Name = "Get Free 5k Gems",
+    Callback = function()
+        local args = {
+            [1] = -1000
+        }
+        
+        game:GetService("ReplicatedStorage"):WaitForChild("Functions"):WaitForChild("SummonBannerEvent"):InvokeServer(unpack(args))
+    end    
+})
+
+
+local CoolLabel = Tab:AddLabel("Current Unit Trait: Please Select Unit!")
+
+Tab:AddDropdown({
+  Name = "Select Unit To Roll:",
+  Default = "",
+  Options = units,
+  Callback = function(Value)
+      -- Extract and print the name of the unit
+      local unitName = Value:match("^(.-) %-")
+      print(unitName)
+      getgenv().UnitName = unitName
+  end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Roll Monarch On Selected Unit",
+	Default = false,
+	Callback = function(Value)
+		getgenv().AutoRoll = true 
+while task.wait(.2) do 
+ if AutoRoll == true then
+  if game:GetService("Players").LocalPlayer.OwnedTowers[getgenv().UnitName]:GetAttribute("Trait") ~= "Monarch" then 
+     print(game:GetService("Players").LocalPlayer.OwnedTowers[getgenv().UnitName]:GetAttribute("Trait"))
+    local args = {
+        [1] = game:GetService("Players").LocalPlayer.OwnedTowers[getgenv().UnitName]
+    }
+    
+    game:GetService("ReplicatedStorage"):WaitForChild("Functions"):WaitForChild("BuyTrait"):InvokeServer(unpack(args))
+    end 
+    CoolLabel:Set("Current Unit Trait: " .. game:GetService("Players").LocalPlayer.OwnedTowers[getgenv().UnitName]:GetAttribute("Trait"))
+ else
+  wait()
+  break
+  end
+  end 
+  
+	end    
+})
+
